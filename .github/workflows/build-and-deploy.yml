@@ -1,0 +1,92 @@
+name: Build and Deploy Satis Repository
+
+on:
+  # Trigger when oicana repo has a new PHP release
+  repository_dispatch:
+    types: [php-release]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout this repo
+        uses: actions/checkout@v4
+
+      - name: Checkout oicana repo
+        uses: actions/checkout@v4
+        with:
+          repository: oicana/oicana
+          path: oicana-source
+          fetch-depth: 0
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          tools: composer:v2
+
+      - name: Install Satis
+        run: composer global require composer/satis
+
+      - name: Create split branches for PHP packages
+        working-directory: oicana-source
+        run: |
+          # Split oicana/oicana package
+          git subtree split --prefix=integrations/php/oicana-php -b split-php-oicana
+
+          # Split oicana/installer package
+          git subtree split --prefix=integrations/php/oicana-php-installer -b split-php-installer
+
+      - name: Update satis.json to use split branches
+        run: |
+          cat > satis.json <<'EOF'
+          {
+              "name": "oicana/packages",
+              "homepage": "https://oicana.github.io/composer",
+              "repositories": [
+                  {
+                      "type": "vcs",
+                      "url": "${{ github.workspace }}/oicana-source",
+                      "branches": ["split-php-oicana", "split-php-installer"]
+                  }
+              ],
+              "require": {
+                  "oicana/oicana": "*",
+                  "oicana/installer": "*"
+              },
+              "require-dependencies": false,
+              "require-dev-dependencies": false,
+              "archive": {
+                  "directory": "dist",
+                  "format": "tar",
+                  "skip-dev": true
+              }
+          }
+          EOF
+
+      - name: Build Satis repository
+        run: |
+          mkdir -p public
+          ~/.composer/vendor/bin/satis build satis.json public --no-interaction
+
+      - name: Upload artifact for GitHub Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

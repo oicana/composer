@@ -1,0 +1,16 @@
+# Build output
+public/
+dist/
+
+# Temporary files
+oicana-source/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo

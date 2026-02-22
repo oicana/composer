@@ -1,0 +1,22 @@
+{
+    "name": "oicana/packages",
+    "homepage": "https://oicana.github.io/composer",
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/oicana/oicana",
+            "name": "oicana/oicana-packages"
+        }
+    ],
+    "require": {
+        "oicana/oicana": "*",
+        "oicana/installer": "*"
+    },
+    "require-dependencies": true,
+    "require-dev-dependencies": false,
+    "archive": {
+        "directory": "dist",
+        "format": "tar",
+        "skip-dev": true
+    }
+}
