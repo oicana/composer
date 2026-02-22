@@ -32,7 +32,9 @@ jobs:
           tools: composer:v2
 
       - name: Install Satis
-        run: composer global require composer/satis:3.x@dev
+        run: |
+          composer global config allow-plugins.composer/satis true
+          composer global require composer/satis:3.x@dev
 
       - name: Create split branches for PHP packages
         working-directory: oicana-source
