@@ -20,7 +20,7 @@ Add this repository to your `composer.json`:
     "repositories": [
         {
             "type": "composer",
-            "url": "https://niklasei.github.io/composer"
+            "url": "https://oicana.github.io/composer"
         }
     ],
     "require": {
