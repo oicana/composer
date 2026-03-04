@@ -1,6 +1,6 @@
 {
     "name": "oicana/packages",
-    "homepage": "https://oicana.github.io/composer",
+    "homepage": "https://composer.oicana.com",
     "repositories": [
         {
             "type": "vcs",
@@ -17,6 +17,6 @@
     "archive": {
         "directory": "dist",
         "format": "tar",
-        "skip-dev": true
+        "skip-dev": false
     }
 }
