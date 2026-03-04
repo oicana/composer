@@ -1,5 +1,7 @@
 # Oicana Composer Repository
 
+_https://composer.oicana.com/_
+
 This repository hosts a [Satis](https://github.com/composer/satis)-based Composer repository for Oicana PHP packages.
 
 ## Available Packages
