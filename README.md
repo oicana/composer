@@ -18,7 +18,7 @@ Add this repository to your `composer.json`:
     "repositories": [
         {
             "type": "composer",
-            "url": "https://composer.oicana.com/composer"
+            "url": "https://composer.oicana.com"
         }
     ],
     "require": {
