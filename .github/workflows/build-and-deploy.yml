@@ -56,9 +56,9 @@ jobs:
             cd ${{ github.workspace }}/oicana-source
           done
 
-          # Process oicana_php_installer tags -> oicana/installer package
-          for tag in $(git tag -l 'oicana_php_installer-v*'); do
-            version="${tag#oicana_php_installer-v}"
+          # Process oicana_php tags -> oicana/installer package (same tag, different subtree)
+          for tag in $(git tag -l 'oicana_php-v*'); do
+            version="${tag#oicana_php-v}"
             git checkout "$tag"
             split_sha=$(git subtree split --prefix=integrations/php/oicana-php-installer)
             cd ${{ github.workspace }}/repo-installer
