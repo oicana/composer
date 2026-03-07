@@ -36,26 +36,51 @@ jobs:
           composer global config allow-plugins.composer/satis true
           composer global require composer/satis:3.x@dev
 
-      - name: Create split branches for PHP packages
-        working-directory: oicana-source
+      - name: Create split repos with version tags from monorepo tags
         run: |
-          # Split oicana/oicana package
-          git subtree split --prefix=integrations/php/oicana-php -b split-php-oicana
+          # Initialize standalone repos for each package
+          git init repo-oicana
+          git init repo-installer
 
-          # Split oicana/installer package
-          git subtree split --prefix=integrations/php/oicana-php-installer -b split-php-installer
+          cd ${{ github.workspace }}/oicana-source
 
-      - name: Update satis.json to use split branches
+          # Process oicana_php tags -> oicana/oicana package
+          for tag in $(git tag -l 'oicana_php-v*'); do
+            version="${tag#oicana_php-v}"
+            git checkout "$tag"
+            # Split the subtree at this tag's commit
+            split_sha=$(git subtree split --prefix=integrations/php/oicana-php)
+            cd ${{ github.workspace }}/repo-oicana
+            git fetch ${{ github.workspace }}/oicana-source "$split_sha"
+            git tag "$version" "$split_sha"
+            cd ${{ github.workspace }}/oicana-source
+          done
+
+          # Process oicana_php_installer tags -> oicana/installer package
+          for tag in $(git tag -l 'oicana_php_installer-v*'); do
+            version="${tag#oicana_php_installer-v}"
+            git checkout "$tag"
+            split_sha=$(git subtree split --prefix=integrations/php/oicana-php-installer)
+            cd ${{ github.workspace }}/repo-installer
+            git fetch ${{ github.workspace }}/oicana-source "$split_sha"
+            git tag "$version" "$split_sha"
+            cd ${{ github.workspace }}/oicana-source
+          done
+
+      - name: Generate satis.json
         run: |
-          cat > satis.json <<'EOF'
+          cat > satis.json <<EOF
           {
               "name": "oicana/packages",
               "homepage": "https://composer.oicana.com",
               "repositories": [
                   {
                       "type": "vcs",
-                      "url": "${{ github.workspace }}/oicana-source",
-                      "branches": ["split-php-oicana", "split-php-installer"]
+                      "url": "${{ github.workspace }}/repo-oicana"
+                  },
+                  {
+                      "type": "vcs",
+                      "url": "${{ github.workspace }}/repo-installer"
                   }
               ],
               "require": {
