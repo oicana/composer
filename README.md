@@ -22,7 +22,7 @@ Add this repository to your `composer.json`:
         }
     ],
     "require": {
-        "oicana/oicana": "^0.1.0-alpha.1"
+        "oicana/oicana": "^0.1.0"
     }
 }
 ```
